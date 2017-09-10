@@ -1,85 +1,90 @@
 package com.scape.test.sort;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import java.util.Arrays;
 
 import org.junit.Test;
 
 public class PairFinderTest {
 	
 	int sum = 10;
+	int [][] trueTestValues = {
+			{9, 7, 4, 2, 1},
+			{9, 7, 9, 4, 2, 1},
+			{3, 5, 3, 3, 5, 8},
+			{5, 3, 7, 1, 8},
+			{5, 3, 7, 1, 6}
+	};
+	int [][] falseTestValues = {
+			{9, 7, 4, 2, 11},
+			{9, 7, 4, 9, 2, 11},
+			{5, 4, 7, 1, 8}
+	};
 
 	PairFinder pairFinder = new PairFinder();
-
+	
 	@Test
-	public void sort_pairPresentT1_present() {
-		int [] values = {9, 7, 4, 2, 1};
+	public void executeUnorderedTestBatch() {
 		
-		boolean found = pairFinder.find(sum, values);
+		long failingTest = Arrays.stream(trueTestValues)
+				.filter(
+						(values) -> !pairFinder.findUnordered(sum, values))
+				.peek(
+						(values) -> System.out.println("Expected " + arrayToString(values) + " to have pair present"))
+				.count();
 		
-		assertTrue(found);
-	}
+		failingTest += Arrays.stream(falseTestValues)
+				.filter(
+						(values) -> pairFinder.findUnordered(sum, values))
+				.peek(
+						(values) -> System.out.println("Expected " + arrayToString(values) + " to NOT have pair present"))
+				.count();
 
-	@Test
-	public void sort_pairNotPresentT1_notPresent() {
-		int [] values = {9, 7, 4, 2, 11};
-		
-		boolean found = pairFinder.find(sum, values);
-		
-		assertFalse(found);
-	}
-
-	@Test
-	public void sort_pairPresentT2_present() {
-		int [] values = {9, 7, 9, 4, 2, 1};
-		
-		boolean found = pairFinder.find(sum, values);
-		
-		assertTrue(found);
-	}
-
-	@Test
-	public void sort_pairNotPresentT2_notPresent() {
-		int [] values = {9, 7, 4, 9, 2, 11};
-		
-		boolean found = pairFinder.find(sum, values);
-		
-		assertFalse(found);
+		assertTrue(failingTest + " tests failed", failingTest == 0);
 	}
 	
 	@Test
-	public void sort_hubbScenario_present(){
-		int [] values = {3, 5, 3, 3, 5, 8};
+	public void executeOrderedTestBatch() {
 		
-		boolean found = pairFinder.find(sum, values);
+		long failingTest = Arrays.stream(trueTestValues)
+				.peek(
+						(values) -> Arrays.sort(values))
+				.filter(
+						(values) -> !pairFinder.findOrdered(sum, values))
+				.peek(
+						(values) -> System.out.println("Expected " + arrayToString(values) + " to have pair present"))
+				.count();
 		
-		assertTrue(found);
+		failingTest += Arrays.stream(falseTestValues)
+				.peek(
+						(values) -> Arrays.sort(values))
+				.filter(
+						(values) -> pairFinder.findOrdered(sum, values))
+				.peek(
+						(values) -> System.out.println("Expected " + arrayToString(values) + " to NOT have pair present"))
+				.count();
+
+		assertTrue(failingTest + " tests failed", failingTest == 0);
 	}
 	
-	@Test
-	public void sort_lowerFirst_present(){
-		int [] values = {5, 3, 7, 1, 8};
+	private String arrayToString(int [] values) {
 		
-		boolean found = pairFinder.find(sum, values);
-		
-		assertTrue(found);
+		return Arrays.stream(values)
+					.mapToObj(
+							value -> String.valueOf(value))
+					.reduce(
+							"[", (acc, value) -> acc + value + ", ")
+			+ "]";
 	}
+
 	
 	@Test
-	public void sort_sumOdd_present(){
+	public void findUnordered_sumOdd_present(){
 		int [] values = {5, 3, 7, 1, 6};
 		
-		boolean found = pairFinder.find(11, values);
+		boolean found = pairFinder.findUnordered(11, values);
 		
 		assertTrue(found);
-	}
-	
-	@Test
-	public void sort_only1EqualsToHalf_notPresent(){
-		int [] values = {5, 4, 7, 1, 8};
-		
-		boolean found = pairFinder.find(sum, values);
-		
-		assertFalse(found);
 	}
 }

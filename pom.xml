@@ -3,18 +3,32 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.scape.test</groupId>
-	<artifactId>sort</artifactId>
+	<artifactId>pair-match</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>sort</name>
+	<name>pair-match</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
+	
+	<build>
+		<plugins>
 
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
+			</plugin>
+      	</plugins>
+	</build>
+	
 	<dependencies>
 		<!-- test -->
 		<dependency>

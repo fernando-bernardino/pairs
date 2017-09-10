@@ -1,25 +1,71 @@
 package com.scape.test.sort;
 
 import static java.util.Arrays.stream;
+
+import java.util.Arrays;
 import java.util.stream.IntStream;
 
 public class PairFinder {
 	
-	/*
+	/**
+	 * Sort the elements prior to finding the pair, so the ordered algorithm for
+	 * finding pairs can be used.
+	 * 
+	 * Sorting algorithm used - quick sort, time complexity O(n log n)
+	 * 
+	 * Time complexity: sort + find = O (n log n) + O (n) = O(n log n)
+	 * 
+	 */
+	public boolean findUnordered(int sum, int[] values){
+		
+		Arrays.sort(values);
+		
+		return findOrdered(sum, values);
+	}
+	
+	/**
+	 * Find pair in a sorted array. Pick the lowest element and the highest and applies:
+	 * 
+	 * IF lower + highest > sum THEN pick the second highest and then repeat
+	 * 
+	 * IF lower + highest < sum THEN pick the second lowest and then repeat
+	 * 
+	 * Time complexity: O (n)
+	 */
+	public boolean findOrdered(int sum, int[] values) {
+		int lowerEnd = 0;
+		int upperEnd = values.length -1;
+		
+		while (lowerEnd < upperEnd) {
+			int sumRemaining = sum - values[lowerEnd] - values[upperEnd];
+			
+			if (sumRemaining == 0) {
+				return true;
+			} else if (sumRemaining > 0){
+				lowerEnd ++;
+			} else {
+				upperEnd --;
+			}
+		}
+		
+		return false;
+	}
+
+	/**
+	 * 
 	 * Algorithm: Divide numbers bigger than half from number smaller than half. 
 	 * 
 	 * Short circuiting decision:
-	 * 
 	 * If total of divided elements < total numbers - 1 means there was at least 2 numbers equal
 	 * to half of the sum
 	 * 
 	 * 
-	 * Time complexity: O(n log n)
+	 * Time complexity: n^2 / 4 -> O(n^2), worst than applying Quick Sort and then apply sorted find
 	 * 
 	 * Space complexity: n
 	 * 
 	 */
-	public boolean find(int sum, int[] values) {
+	public boolean findDivideBiggerFromSmallerThanHalf(int sum, int[] values) {
 
 		double half = sum / 2.0;
 
@@ -46,20 +92,19 @@ public class PairFinder {
 	}
 	
 	
-	public boolean findV1SubExponential(int sum, int[] values) {
 
-		/*
-		 * Plain algorithm: creates all possible combinations between two number
-		 *
-		 * Time complexity:
-		 * 
-		 * worst case scenario (pair not found) -> o(n^2) -> exponential
-		 *
-		 * average scenario (pair found half way) -> O(n^2) -> exponential
-		 * 
-		 * Space complexity: 1
-		 * 
-		 */
+	/**
+	 * 
+	 * Plain algorithm: creates all possible combinations between two number
+	 *
+	 * Time complexity:
+	 * 
+	 * worst case scenario (pair not found) -> o(n^2) -> exponential
+	 *
+	 * average scenario (pair found half way) -> O(n^2) -> exponential
+	 * 
+	 */
+	public boolean findV1SubExponential(int sum, int[] values) {
 
 		return IntStream.range(0, values.length)
 				.anyMatch(
@@ -68,16 +113,15 @@ public class PairFinder {
 												(j) -> values[i] + values[j] == sum));
 	}
 
-	/*
-	 * Algorithm: cut condition introduced - iteration stops when a repetition
-	 * is found
+	/**
+	 * Algorithm: cut condition introduced in plain algorithm - iteration for current
+	 * element stops when a repetition is found
 	 * 
-	 * Performance strongly depends on probability of element repetition
-	 * Time complexity:
+	 * Complexity strongly depends on probability of element repetition
 	 * 
-	 * For no repetitions behaves same as plain algorithm -> O(n^2) exponential
+	 * For no repetitions behaves same as plain algorithm
 	 * 
-	 * Space complexity: 1
+	 * Time complexity: O(n^2) exponential
 	 * 
 	 */
 	public boolean findV2SubExponential(int sum, int[] values) {
@@ -99,50 +143,4 @@ public class PairFinder {
 				.anyMatch(
 						(value) -> value == toFind);
 	}
-	
-	/*
-	 * Algorithm: Divide numbers bigger than half from number smaller than half.
-	 * 
-	 * Time complexity: O(n log n)
-	 * 
-	 * Space complexity: n
-	 * 
-	 */	
-	public boolean findUltraOptimizedUnreadableSolution(int sum, int[] values) {
-		
-		double half = sum / 2.0;
-		int length = values.length;
-		int [] divided = new int [length];
-		int upperEnd = 0;
-		int lowerEnd = length;
-		int numbersEqualHalf = 0;
-		
-		for(int i = 0; i < length; i ++){
-			int value = values[i];
-			
-			if (value == half) {
-				numbersEqualHalf ++;
-			} else if (value < half) {
-				divided[--lowerEnd] = value;
-			} else if (value < sum) {
-				divided[upperEnd ++] = value;
-			}
-		}
-		
-		return numbersEqualHalf > 1 ?
-			true :
-			match(sum, length, divided, upperEnd, lowerEnd);
-	}
-
-	private boolean match(int sum, int length, int[] divided, int upperEnd, int lowerEnd) {
-		
-		return IntStream.range(0, upperEnd)
-						.map(
-								(i) -> sum - divided[i])
-						.anyMatch(
-								(remaining) -> IntStream.range(lowerEnd, length)
-														.anyMatch(
-																(j) -> divided[j] == remaining));
-	}
-
 }
